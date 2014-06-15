@@ -82,7 +82,6 @@ app.post('/new', function(req, res) {
 });
 
 app.get('/guess/:id', function(req, res) {
-    console.log("FITTE")
     getGame(req.params.id).then(function(game) {
         res.render('guess', {
             game: game
