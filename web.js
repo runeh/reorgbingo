@@ -26,12 +26,11 @@ app.use(session({
     secret: 'opirf3fporf-3f-kfmcm43f-k[o2pmqcqpof-3o4fqpmrwbwnibnbwp34043pogrgpoe04',
 }));
 
-var connectionString = 'morradi'
-
-var db = pmongo(connectionString, ['games', 'guesses']);
-
 app.use(logfmt.requestLogger());
 
+var connectionString = process.env.MONGOSOUP_URL || 'mongodev';
+
+var db = pmongo(connectionString, ['games', 'guesses']);
 
 function getGame(id) {
     return db.collection('games').findOne({id: id});
