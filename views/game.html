@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{game.title}}</h1>
+
+{% if game.body %}
+<p>
+    {{game.body}}
+</p>
+{% endif %}
+
+{% if game.showGuesses %}
+<p>
+    show guesses
+</p>
+{% else %}
+<p>
+    no show guesses
+</p>
+{% endif %}
+
+<a href="/guess/{{game.id}}">Add your guess!</a>
+
+game
+{{game|json(4)}}
+
+{% endblock %}

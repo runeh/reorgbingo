@@ -30,10 +30,21 @@ var connectionString = 'morradi'
 
 var db = pmongo(connectionString, ['games', 'guesses']);
 
-var games = db.collection('games');
-var guesses = db.collection('guesses');
-
 app.use(logfmt.requestLogger());
+
+
+function getGame(id) {
+    return db.collection('games').findOne({id: id});
+}
+
+function createGame(game) {
+    return db.collection('games').insert(game);
+}
+
+function createGuess(guess) {
+    return db.collection('guesses').insert(guess);
+}
+
 
 app.get('/', function(req, res) {
     res.render('index', {});
@@ -56,20 +67,32 @@ app.post('/new', function(req, res) {
         });        
     }
     else {
-        games.insert({
+        createGame({
             title: req.body.title,
             description: req.body.body,
             ownerEmail: req.body.email,
             id: uuid.v4(),
             publicId: uuid.v4(),
             ownerId: uuid.v4()
-        }).then(console.log).done();
+        }).
+        then(function(game) {
+            // fixme: set user ownership session
+            res.redirect("/g/" + game.id);            
+        }).done();
     }    
 });
 
+app.get('/guess/:id', function(req, res) {
+    console.log("FITTE")
+    getGame(req.params.id).then(function(game) {
+        res.render('guess', {
+            game: game
+        });
+    });
+});
+
 app.get('/g/:id', function(req, res) {
-    games.findOne({id: req.params.id}).then(function(game) {
-        console.log(game);
+    getGame(req.params.id).then(function(game) {
         res.render('game', {
             game: game
         });
