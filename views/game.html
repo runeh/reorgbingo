@@ -10,17 +10,15 @@
 </p>
 {% endif %}
 
-{% if game.showGuesses %}
-<p>
-    show guesses
-</p>
+{% if guesses.length %}
+            
 {% else %}
-<p>
-    no show guesses
-</p>
+    No guesses yet! <a href="/guess/{{game.id}}">Add your own</a>
 {% endif %}
 
-<a href="/guess/{{game.id}}">Add your guess!</a>
+{% if userHaveGuessed %}
+    <a href="/guess/{{game.id}}">Add your guess!</a>
+{% endif %}
 
 game
 {{game|json(4)}}
