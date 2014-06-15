@@ -2,13 +2,39 @@
 
 {% block content %}
 
+<div>
+    <ol>
+        <li>Email is required, but will never be shown.</li>
+    </ol>
+</div>
+
 <form method="post">
-    Email:<br><input type="email" name="email">
+    <label>Email:</label>
+    <br><input type="email" name="email" value="{{form.email}}">
+    {% if errors.email %}
+        <br>
+        <small>A valid email address is required.</small>
+    {% endif %}
     <br>
-    Title:<br><input name="title">
     <br>
-    Body:<br><textarea name="body"></textarea>
+
+    Title:<br><input name="title" value="{{form.title}}">
+    {% if errors.title %}
+        <br>
+        <small>A title is required</small>
+    {% endif %}
     <br>
+    <br>
+
+    <label>Body:</label>
+    <br><textarea name="body">{{form.body}}</textarea>
+    <br>
+
+    <label>Show votes on bingo page</label> <input type="checkbox" name="showGuesses">
+
+    <button type="Submit">Start game</button>
 </form>
+
+<br>
 
 {% endblock %}
