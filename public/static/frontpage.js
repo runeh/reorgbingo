@@ -5,6 +5,13 @@ function init() {
     newGuessController();
 }
 
+function httpPost(url, payload, callback) {
+    var request = new XMLHttpRequest();
+    request.open('POST', url);
+    request.onloadend = function() { callback(request); };
+    request.send(payload);
+}
+
 function newGameController() {
     var form = document.querySelector('[data-controller=newgame]');
     if (!form) { return }
@@ -14,10 +21,8 @@ function newGameController() {
     form.addEventListener('submit', function(evt) {
         evt.preventDefault();
         throbber.classList.remove('hidden');
-        var request = new XMLHttpRequest();
-        request.open('POST', form.action);
-        request.send(new FormData(form));
-        request.onloadend = function() {
+
+        httpPost(form.action, new FormData(form), function(request) {
             throbber.classList.add('hidden');
 
             if (request.status == 201) {
@@ -26,8 +31,7 @@ function newGameController() {
             else {
                 // fixme: add form feedback shit
             }
-
-        }
+        });
     });
 }
 
@@ -40,10 +44,8 @@ function newGuessController() {
     form.addEventListener('submit', function(evt) {
         evt.preventDefault();
         throbber.classList.remove('hidden');
-        var request = new XMLHttpRequest();
-        request.open('POST', form.action);
-        request.send(new FormData(form));
-        request.onloadend = function() {
+
+        httpPost(form.action, new FormData(form), function(request) {
             throbber.classList.add('hidden');
             if (request.status == 201) {
                 var guess = JSON.parse(request.responseText);
@@ -52,8 +54,7 @@ function newGuessController() {
             else {
                 // fixme: add form feedback shit
             }
-
-        }
+        });
     });
 }
 
