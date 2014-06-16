@@ -95,44 +95,10 @@ app.post('/json/newguess', function(req, res) {
             email: req.body.email
         }).
         then(function(guess) {
-            console.log('created', guess);
             res.json(201, guess);
         }).
         done()
     }
-
-
-});
-
-app.get('/guess/:id', function(req, res) {
-    getGame(req.params.id).then(function(game) {
-        res.render('guess', {
-            game: game
-        });
-    });
-});
-
-app.post('/guess/:id', function(req, res) {
-    if (req.body.email) {
-        req.checkBody('email').isEmail();
-    }
-    req.checkBody('name').notEmpty();
-    req.checkBody('date').isDate().isAfter(new Date());
-
-    getGame(req.params.id).then(function(game) {
-        var errors = req.validationErrors(true)
-        if (errors) {
-            res.render('guess', {
-                form: req.body,
-                game: game,
-                errors: errors
-            });
-        }
-        else {
-
-            console.log("KWKWKWKW", new Date(req.body.date))
-        }
-    });
 });
 
 app.get('/g/:id', function(req, res) {
@@ -144,7 +110,6 @@ app.get('/g/:id', function(req, res) {
         });
     });
 });
-
 
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
