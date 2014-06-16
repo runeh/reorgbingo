@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 
-{% block links %}
-    <link rel="create" href="/json/newgame">
-{% endblock %}
-
 {% block content %}
 
 <p>
@@ -14,7 +10,7 @@
     <summary class="buttonlike">Cool beans! Let me make one</summary>
     <div class="createbox">
 
-        <form method="post" data-controller="newgame">
+        <form action="/json/newgame" method="post" data-controller="newgame">
             <label>Email:</label>
             <br><input type="email" name="email" value="{{form.email}}">
             <br>

@@ -11,13 +11,34 @@
 {% endif %}
 
 {% if guesses.length %}
-            
+    <ol>
+    {% for guess in guesses %}
+        <li>woo {{guess}}</li>
+    {% endfor %}
+    </ol>
 {% else %}
-    No guesses yet! <a href="/guess/{{game.id}}">Add your own</a>
+    No guesses yet.
 {% endif %}
 
-{% if userHaveGuessed %}
-    <a href="/guess/{{game.id}}">Add your guess!</a>
+{% if not userHaveGuessed %}
+    <details class="singleopen">
+        <summary class="buttonlike">Add your own guess</summary>
+        <div class="createbox">
+            <form action="/json/newguess" method="post" data-controller="newguess">
+                <input type="hidden" value="{{game.id}}">
+                <label>Name:<br><input name="name" value="{{form.name}}"></label>
+                <br>
+                <label>Email:<br><input type="email" name="email" value="{{form.email}}"></label>
+                <br>
+                <small>Optional. If given, we will email you when the game is over</small>
+                <br>
+                <label>Reorg date:<br><input type="date" name="date" value="{{form.date}}"></label>
+                <br>
+                <button type="submit">Make your guess</button>
+                <div data-throbber class="hidden">Loading</div>
+            </form>
+        </div>
+    </details>
 {% endif %}
 
 game

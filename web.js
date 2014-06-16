@@ -77,6 +77,33 @@ app.post('/json/newgame', function(req, res) {
     }
 });
 
+app.post('/json/newguess', function(req, res) {
+    if (req.body.email) {
+        req.checkBody('email').isEmail();
+    }
+    req.checkBody('name').notEmpty();
+    req.checkBody('date').isDate().isAfter(new Date());
+
+    var errors = req.validationErrors(true)
+    if (errors) {
+        res.send(406);
+    }
+    else {
+        createGuess({
+            name: req.body.name,
+            date: new Date(req.body.date),
+            email: req.body.email
+        }).
+        then(function(guess) {
+            console.log('created', guess);
+            res.json(201, guess);
+        }).
+        done()
+    }
+
+
+});
+
 app.get('/guess/:id', function(req, res) {
     getGame(req.params.id).then(function(game) {
         res.render('guess', {
