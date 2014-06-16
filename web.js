@@ -3,10 +3,10 @@ var logfmt = require('logfmt');
 var pmongo = require('promised-mongo');
 var swig = require('swig');
 var session = require('cookie-session');
-var bodyParser = require('body-parser');
 var favicon = require('serve-favicon');
 var validator = require('express-validator');
 var uuid = require('uuid');
+var multer = require('multer');
 
 var app = express();
 
@@ -18,7 +18,7 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(__dirname + '/public'));     // set the static files location /public/img will be /img for users
 swig.setDefaults({ cache: false });
 
-app.use(bodyParser());
+app.use(multer());
 app.use(validator());
 
 app.use(session({
@@ -44,26 +44,18 @@ function createGuess(guess) {
     return db.collection('guesses').insert(guess);
 }
 
-
 app.get('/', function(req, res) {
+        console.log(JSON.stringify(req.session));
     res.render('index', {});
 });
 
-app.get('/new', function(req, res) {
-    res.render('new', {});
-});
-
-app.post('/new', function(req, res) {
+app.post('/json/newgame', function(req, res) {
     req.checkBody('email').notEmpty().isEmail();
     req.checkBody('title').notEmpty();
-
     var errors = req.validationErrors(true)
 
     if (errors) {
-        res.render('new', {
-            form: req.body,
-            errors: req.validationErrors(true)
-        });        
+        res.json(406, { errors: errors });
     }
     else {
         createGame({
@@ -71,14 +63,18 @@ app.post('/new', function(req, res) {
             description: req.body.body,
             ownerEmail: req.body.email,
             id: uuid.v4(),
-            publicId: uuid.v4(),
-            ownerId: uuid.v4()
         }).
         then(function(game) {
-            // fixme: set user ownership session
-            res.redirect("/g/" + game.id);            
-        }).done();
-    }    
+            if (!req.session.owned) {
+                req.session.owned = [];
+            }
+            req.session.owned.push(game.id);
+            var path = '/g/' + game.id;
+            res.header('Location', path);
+            res.send(201);
+        }).
+        done();
+    }
 });
 
 app.get('/guess/:id', function(req, res) {
@@ -114,6 +110,8 @@ app.post('/guess/:id', function(req, res) {
 
 app.get('/g/:id', function(req, res) {
     getGame(req.params.id).then(function(game) {
+        console.log(JSON.stringify(req.session));
+
         res.render('game', {
             game: game
         });

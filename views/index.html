@@ -1,13 +1,35 @@
 {% extends 'base.html' %}
 
+{% block links %}
+    <link rel="create" href="/json/newgame">
+{% endblock %}
+
 {% block content %}
 
 <p>
     Prose explaining what is up.
 </p>
 
-<p>
-    <a href="/new">Start new competition!</a>
-</p>
+<details class="singleopen">
+    <summary class="buttonlike">Cool beans! Let me make one</summary>
+    <div class="createbox">
+
+        <form method="post" data-controller="newgame">
+            <label>Email:</label>
+            <br><input type="email" name="email" value="{{form.email}}">
+            <br>
+
+            Title:<br><input name="title" value="{{form.title}}">
+            <br>
+
+            <label>Body:</label>
+            <br><textarea name="body">{{form.body}}</textarea>
+            <br>
+
+            <button type="Submit">Make it</button>
+            <div data-throbber class="hidden">Loading</div>
+        </form>
+    </div>
+</details>
 
 {% endblock %}
