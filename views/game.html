@@ -10,22 +10,12 @@
 </p>
 {% endif %}
 
-{% if guesses.length %}
-    <ol>
-    {% for guess in guesses %}
-        <li>woo {{guess}}</li>
-    {% endfor %}
-    </ol>
-{% else %}
-    No guesses yet.
-{% endif %}
-
-{% if not userHaveGuessed %}
-    <details class="singleopen">
+{% if not hasGuessed %}
+    <details class="singleopen" data-guessbox>
         <summary class="buttonlike">Add your own guess</summary>
         <div class="createbox">
             <form action="/json/newguess" method="post" data-controller="newguess">
-                <input type="hidden" value="{{game.id}}">
+                <input name="game" type="hidden" value="{{game.id}}">
                 <label>Name:<br><input name="name" value="{{form.name}}"></label>
                 <br>
                 <label>Email:<br><input type="email" name="email" value="{{form.email}}"></label>
@@ -40,5 +30,15 @@
         </div>
     </details>
 {% endif %}
+
+<ol data-guess-list>
+{% if guesses.length %}
+    {% for guess in guesses %}
+        <li>{{guess.name}} &bull; {{guess.date|date("jS M Y")}}</li>
+    {% endfor %}
+{% else %}
+    <li data-no-guess-placeholder>No guesses yet</li>
+{% endif %}
+</ol>
 
 {% endblock %}

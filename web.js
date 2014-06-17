@@ -7,6 +7,8 @@ var favicon = require('serve-favicon');
 var validator = require('express-validator');
 var uuid = require('uuid');
 var multer = require('multer');
+var bluebird = require('bluebird');
+
 
 var app = express();
 
@@ -44,8 +46,17 @@ function createGuess(guess) {
     return db.collection('guesses').insert(guess);
 }
 
+function getGuesses(gameId) {
+    return db.collection('guesses').find({game: gameId});
+}
+
+function touchSession(req) {
+    console.log("watwat", req.session)
+    if (!req.session.owned) { req.session.owned = []; }
+    if (!req.session.guessed) { req.session.guessed = []; }
+}
+
 app.get('/', function(req, res) {
-        console.log(JSON.stringify(req.session));
     res.render('index', {});
 });
 
@@ -65,9 +76,7 @@ app.post('/json/newgame', function(req, res) {
             id: uuid.v4(),
         }).
         then(function(game) {
-            if (!req.session.owned) {
-                req.session.owned = [];
-            }
+            touchSession(req);
             req.session.owned.push(game.id);
             var path = '/g/' + game.id;
             res.header('Location', path);
@@ -90,23 +99,28 @@ app.post('/json/newguess', function(req, res) {
     }
     else {
         createGuess({
+            game: req.body.game,
             name: req.body.name,
             date: new Date(req.body.date),
             email: req.body.email
         }).
         then(function(guess) {
+            touchSession(req);
+            req.session.guessed.push(guess.game);
             res.json(201, guess);
         }).
-        done()
+        done();
     }
 });
 
 app.get('/g/:id', function(req, res) {
-    getGame(req.params.id).then(function(game) {
-        console.log(JSON.stringify(req.session));
-
+    var gid = req.params.id;
+    bluebird.join(getGame(gid), getGuesses(gid).toArray()).spread(function(game, guesses) {
+        touchSession(req);
         res.render('game', {
-            game: game
+            game: game,
+            guesses: guesses,
+            hasGuessed: req.session.guessed.indexOf(game.id) != -1
         });
     });
 });

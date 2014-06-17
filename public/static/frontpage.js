@@ -49,7 +49,18 @@ function newGuessController() {
             throbber.classList.add('hidden');
             if (request.status == 201) {
                 var guess = JSON.parse(request.responseText);
-                console.log(guess);
+                var box = document.querySelector('[data-guessbox]');
+                box.parentNode.removeChild(box);
+                var li = document.createElement('li');
+                li.textContent = guess.name + ' ' + guess.date;
+                var list = document.querySelector('[data-guess-list]');
+                list.appendChild(li);
+
+                li = document.querySelector('[data-no-guess-placeholder]');
+                if (li) {
+                    li.parentNode.removeChild(li);
+                }
+
             }
             else {
                 // fixme: add form feedback shit
