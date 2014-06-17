@@ -62,7 +62,7 @@ app.get('/', function(req, res) {
 
 app.post('/json/newgame', function(req, res) {
     req.checkBody('email').notEmpty().isEmail();
-    req.checkBody('title').notEmpty();
+    req.checkBody('company').notEmpty();
     var errors = req.validationErrors(true)
 
     if (errors) {
@@ -70,8 +70,8 @@ app.post('/json/newgame', function(req, res) {
     }
     else {
         createGame({
-            title: req.body.title,
-            description: req.body.body,
+            company: req.body.company,
+            description: req.body.description,
             ownerEmail: req.body.email,
             id: uuid.v4(),
         }).
