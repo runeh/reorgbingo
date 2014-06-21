@@ -34,7 +34,12 @@
 <ol data-guess-list>
 {% if guesses.length %}
     {% for guess in guesses %}
-        <li>{{guess.name}} &bull; {{guess.date|date("jS M Y")}}</li>
+        <li>{{guess.name}} &bull; Reorg
+        {% if guess.dayDelta > 0 %}
+         in {{guess.dayDelta}} days
+        {% else %}
+         {{guess.dayDelta}} days ago
+        {% endif %}
     {% endfor %}
 {% else %}
     <li data-no-guess-placeholder>No guesses yet</li>

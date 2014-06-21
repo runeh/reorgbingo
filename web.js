@@ -47,11 +47,10 @@ function createGuess(guess) {
 }
 
 function getGuesses(gameId) {
-    return db.collection('guesses').find({game: gameId});
+    return db.collection('guesses').find({game: gameId}).sort({date: -1});
 }
 
 function touchSession(req) {
-    console.log("watwat", req.session)
     if (!req.session.owned) { req.session.owned = []; }
     if (!req.session.guessed) { req.session.guessed = []; }
 }
@@ -106,6 +105,7 @@ app.post('/json/newguess', function(req, res) {
         }).
         then(function(guess) {
             touchSession(req);
+            addComputedTimes(guess);
             req.session.guessed.push(guess.game);
             res.json(201, guess);
         }).
@@ -113,10 +113,22 @@ app.post('/json/newguess', function(req, res) {
     }
 });
 
+function addComputedTimes(guess) {
+    var now = new Date();
+    var then = guess.date;
+
+    guess.dayDelta = Math.ceil((then - now) / 86400000);
+    guess.absDelta = Math.abs(guess.dayDelta);
+    guess.inFuture = guess.dayDelta > 0;
+    guess.today = guess.dayDelta == 0;
+}
+
 app.get('/g/:id', function(req, res) {
     var gid = req.params.id;
     bluebird.join(getGame(gid), getGuesses(gid).toArray()).spread(function(game, guesses) {
         touchSession(req);
+        guesses.forEach(addComputedTimes);
+
         res.render('game', {
             game: game,
             guesses: guesses,
