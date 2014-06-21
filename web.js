@@ -6,9 +6,8 @@ var session = require('cookie-session');
 var favicon = require('serve-favicon');
 var validator = require('express-validator');
 var uuid = require('uuid');
-var multer = require('multer');
+var bodyParser = require('body-parser')
 var bluebird = require('bluebird');
-
 
 var app = express();
 
@@ -20,7 +19,7 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(__dirname + '/public'));     // set the static files location /public/img will be /img for users
 swig.setDefaults({ cache: false });
 
-app.use(multer());
+app.use(bodyParser.urlencoded({extended:false}));
 app.use(validator());
 
 app.use(session({
@@ -59,27 +58,30 @@ app.get('/', function(req, res) {
     res.render('index', {});
 });
 
-app.post('/json/newgame', function(req, res) {
+app.post('/', function(req, res) {
     req.checkBody('email').notEmpty().isEmail();
     req.checkBody('company').notEmpty();
     var errors = req.validationErrors(true)
 
     if (errors) {
-        res.json(406, { errors: errors });
+        res.render('index', {
+            editing: true,
+            errors: errors,
+            form: req.body
+        });
     }
     else {
         createGame({
             company: req.body.company,
             description: req.body.description,
             ownerEmail: req.body.email,
-            id: uuid.v4(),
+            id: uuid.v4()
         }).
         then(function(game) {
             touchSession(req);
             req.session.owned.push(game.id);
             var path = '/g/' + game.id;
-            res.header('Location', path);
-            res.send(201);
+            res.redirect(path)
         }).
         done();
     }

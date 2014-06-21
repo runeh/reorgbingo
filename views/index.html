@@ -14,24 +14,31 @@
     List of public games?
 </p>
 
-<details class="singleopen">
+<details class="singleopen" {% if editing %}open{% endif %} >
     <summary class="buttonlike">Cool beans! Let me make one</summary>
     <div class="createbox">
 
-        <form action="/json/newgame" method="post" data-controller="newgame">
-            <label>Email:</label>
+        <form method="post">
+            <label>Email: <small>required</small></label>
             <br><input type="email" name="email" value="{{form.email}}">
+            <br>
+            {% if errors.email %}
+                <small>Email is required.</small><br>
+            {% endif %}
             <br>
 
             Company:<br><input name="company" value="{{form.company}}">
             <br>
+            {% if errors.company %}
+                <small>A company name is required</small><br>
+            {% endif %}
+            <br>
 
-            <label>Description:</label><small>optional</small>
+            <label>Description: </label><small>optional</small>
             <br><textarea name="body">{{form.description}}</textarea>
             <br>
 
             <button type="Submit">Make it</button>
-            <div data-throbber class="hidden">Loading</div>
         </form>
     </div>
 </details>
