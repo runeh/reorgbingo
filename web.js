@@ -46,7 +46,7 @@ function createGuess(guess) {
 }
 
 function getGuesses(gameId) {
-    return db.collection('guesses').find({game: gameId}).sort({date: -1});
+    return db.collection('guesses').find({game: gameId}).sort({date: -1}).toArray();
 }
 
 function touchSession(req) {
@@ -87,33 +87,56 @@ app.post('/', function(req, res) {
     }
 });
 
-app.post('/json/newguess', function(req, res) {
+app.get('/g/:id', function(req, res) {
+    getGuessViewData(req.params.id, req).then(function(props) {
+        res.render('game', props);
+    });
+});
+
+app.post('/g/:id', function(req, res) {
     if (req.body.email) {
         req.checkBody('email').isEmail();
     }
     req.checkBody('name').notEmpty();
     req.checkBody('date').isDate().isAfter(new Date());
-
     var errors = req.validationErrors(true)
+
     if (errors) {
-        res.send(406);
+        getGuessViewData(req.params.id, req).
+        then(function(props) {
+            props.errors = errors;
+            props.form = req.body;
+            props.editing = true;
+            res.render('game', props);
+        }).
+        done();
     }
     else {
         createGuess({
-            game: req.body.game,
+            game: req.params.id,
             name: req.body.name,
             date: new Date(req.body.date),
             email: req.body.email
         }).
-        then(function(guess) {
-            touchSession(req);
-            addComputedTimes(guess);
-            req.session.guessed.push(guess.game);
-            res.json(201, guess);
+        then(function() {
+            req.session.guessed.push(req.params.id);
         }).
+        then(getGuessViewData.bind(null, req.params.id, req)).
+        then(res.render.bind(res, 'game')).
         done();
     }
 });
+
+function getGuessViewData(gid, req) {
+    return bluebird.props({
+        game: getGame(gid),
+        guesses: getGuesses(gid)
+    }).tap(function(props) {
+        touchSession(req);
+        props.guesses.forEach(addComputedTimes);
+        props.hasGuessed = req.session.guessed.indexOf(props.game.id) != -1;
+    });
+}
 
 function addComputedTimes(guess) {
     var now = new Date();
@@ -124,20 +147,6 @@ function addComputedTimes(guess) {
     guess.inFuture = guess.dayDelta > 0;
     guess.today = guess.dayDelta == 0;
 }
-
-app.get('/g/:id', function(req, res) {
-    var gid = req.params.id;
-    bluebird.join(getGame(gid), getGuesses(gid).toArray()).spread(function(game, guesses) {
-        touchSession(req);
-        guesses.forEach(addComputedTimes);
-
-        res.render('game', {
-            game: game,
-            guesses: guesses,
-            hasGuessed: req.session.guessed.indexOf(game.id) != -1
-        });
-    });
-});
 
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {

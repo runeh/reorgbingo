@@ -9,23 +9,34 @@
     {{game.description}}
 </p>
 {% endif %}
-
 {% if not hasGuessed %}
-    <details class="singleopen" data-guessbox>
+    <details class="singleopen" {% if editing %}open{% endif %}>
         <summary class="buttonlike">Add your own guess</summary>
         <div class="createbox">
-            <form action="/json/newguess" method="post" data-controller="newguess">
-                <input name="game" type="hidden" value="{{game.id}}">
-                <label>Name:<br><input name="name" value="{{form.name}}"></label>
+            <form method="post">
+                <label>Name: <small>required</small><br>
+                <input name="name" value="{{form.name}}"></label>
+                <br>
+                {% if errors.name %}
+                <small>Name is required</small><br>
+                {% endif %}
                 <br>
                 <label>Email:<br><input type="email" name="email" value="{{form.email}}"></label>
                 <br>
+                {% if errors.email %}
+                <small>Use a valid email, or no email</small><br>
+                {% endif %}
                 <small>Optional. If given, we will email you when the game is over</small>
                 <br>
+                <br>
                 <label>Reorg date:<br><input type="date" name="date" value="{{form.date}}"></label>
+                {% if errors.date %}
+                <br>
+                <small>A date is required</small><br>
+                {% endif %}
+                <br>
                 <br>
                 <button type="submit">Make your guess</button>
-                <div data-throbber class="hidden">Loading</div>
             </form>
         </div>
     </details>
