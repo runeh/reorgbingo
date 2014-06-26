@@ -42,19 +42,56 @@
     </details>
 {% endif %}
 
-<ol data-guess-list>
 {% if guesses.length %}
     {% for guess in guesses %}
-        <li>{{guess.name}} &bull; Reorg
+        <div>
+            {{guess.name}}: in  {{guess.date|fromNow}}
         {% if guess.dayDelta > 0 %}
          in {{guess.dayDelta}} days
         {% else %}
          {{guess.dayDelta}} days ago
         {% endif %}
+        </div>
     {% endfor %}
 {% else %}
-    <li data-no-guess-placeholder>No guesses yet</li>
+    <div>No guesses yet</div>
 {% endif %}
-</ol>
+
+<hr>
+testmarkup
+
+<div class="guessbox past_further">
+    <h2>Frank: <small><date>months ago</date></small></h2>
+</div>
+
+<div class="guessbox past_far">
+    <h2>Pelle: <small><date>weeks ago</date></small></h2>
+</div>
+
+<div class="guessbox past_near">
+    <h2>Arne: <small><date>days ago</date></small></h2>
+</div>
+
+<div class="guessbox">
+    <h2>Morten: <small><date>today</date></small></h2>
+</div>
+
+<div class="guessbox">
+    <h2>Idag!</h2>
+</div>
+
+<div class="guessbox future_near">
+    <h2>Eirik: <small><date>in 3 days</date></small></h2>
+</div>
+
+<div class="guessbox future_far">
+    <h2>Esteban: <small><date>in 3 weeks</date></small></h2>
+</div>
+
+<div class="guessbox future_further">
+    <h2>Sverre: <small><date>in 6 months</date></small></h2>
+</div>
+
 
 {% endblock %}
+

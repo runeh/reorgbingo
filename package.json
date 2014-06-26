@@ -27,7 +27,8 @@
     "express-validator": "~2.3.0",
     "uuid": "~1.4.1",
     "bluebird": "~2.1.2",
-    "body-parser": "~1.4.3"
+    "body-parser": "~1.4.3",
+    "moment": "~2.7.0"
   },
   "engines": {
     "node": "0.10.x"

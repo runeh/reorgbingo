@@ -8,6 +8,7 @@ var validator = require('express-validator');
 var uuid = require('uuid');
 var bodyParser = require('body-parser')
 var bluebird = require('bluebird');
+var moment = require('moment');
 
 var app = express();
 
@@ -32,6 +33,10 @@ app.use(logfmt.requestLogger());
 var connectionString = process.env.MONGOSOUP_URL || 'mongodev';
 
 var db = pmongo(connectionString, ['games', 'guesses']);
+
+swig.setFilter('fromNow', function(then) {
+    return moment(then).fromNow();
+});
 
 function getGame(id) {
     return db.collection('games').findOne({id: id});
