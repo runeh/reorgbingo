@@ -54,10 +54,11 @@ function getGuesses(gameId) {
     return db.collection('guesses').find({game: gameId}).sort({date: -1}).toArray();
 }
 
-function touchSession(req) {
+app.use(function(req, res, next){
     if (!req.session.owned) { req.session.owned = []; }
     if (!req.session.guessed) { req.session.guessed = []; }
-}
+    next();
+});
 
 app.get('/', function(req, res) {
     res.render('index', {});
@@ -83,7 +84,6 @@ app.post('/', function(req, res) {
             id: uuid.v4()
         }).
         then(function(game) {
-            touchSession(req);
             req.session.owned.push(game.id);
             var path = '/g/' + game.id;
             res.redirect(path)
@@ -137,7 +137,6 @@ function getGuessViewData(gid, req) {
         game: getGame(gid),
         guesses: getGuesses(gid)
     }).tap(function(props) {
-        touchSession(req);
         props.guesses.forEach(addComputedTimes);
         props.hasGuessed = req.session.guessed.indexOf(props.game.id) != -1;
     });
