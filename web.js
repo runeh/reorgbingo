@@ -10,6 +10,8 @@ var bodyParser = require('body-parser')
 var bluebird = require('bluebird');
 var moment = require('moment');
 
+var conf = require('./config.js');
+
 var app = express();
 
 app.engine('html', swig.renderFile);
@@ -24,8 +26,8 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(validator());
 
 app.use(session({
-    name: 'reorgbingo',
-    secret: 'opirf3fporf-3f-kfmcm43f-k[o2pmqcqpof-3o4fqpmrwbwnibnbwp34043pogrgpoe04',
+    name: 'reorgno',
+    secret: conf.get('secret'),
 }));
 
 app.use(logfmt.requestLogger());
@@ -54,7 +56,7 @@ function getGuesses(gameId) {
     return db.collection('guesses').find({game: gameId}).sort({date: -1}).toArray();
 }
 
-app.use(function(req, res, next){
+app.use(function(req, res, next) {
     if (!req.session.owned) { req.session.owned = []; }
     if (!req.session.guessed) { req.session.guessed = []; }
     next();
@@ -152,7 +154,6 @@ function addComputedTimes(guess) {
     guess.today = guess.dayDelta == 0;
 }
 
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-    console.log('Listening on ' + port);
+app.listen(conf.get('port'), function() {
+    console.log('Listening on ' + conf.get('port'));
 });

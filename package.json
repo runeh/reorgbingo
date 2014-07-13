@@ -28,7 +28,8 @@
     "uuid": "~1.4.1",
     "bluebird": "~2.1.2",
     "body-parser": "~1.4.3",
-    "moment": "~2.7.0"
+    "moment": "~2.7.0",
+    "convict": "^0.4.2"
   },
   "engines": {
     "node": "0.10.x"
