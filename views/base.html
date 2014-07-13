@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <title>reorgbingo</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css">
+{% if devmode %}<h1 style="background-color: red; color: white;">Dev mode!</h1>{% endif %}
 
 <h1><a href="/">reorg.no</a></h1>
 <hr>
@@ -11,5 +12,6 @@
         {% block content %}{% endblock %}
     </div>
 <hr>
+
 
 &copy; &trade; blergh blergh

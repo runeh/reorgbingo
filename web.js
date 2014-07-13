@@ -14,6 +14,8 @@ var conf = require('./config.js');
 
 var app = express();
 
+app.locals.devmode = conf.get('env') == 'development';
+
 app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
